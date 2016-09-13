@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Assignment 2</title>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.js"></script>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body ng-app="assignment2">
+<div class="container">
+		<div class="jumbotron page-header">
+			<h2> User Registration Form </h2>
+		</div>
+
+	<div class="panel-group" ng-controller="LoginCtrl">
+		<registration-page></registration-page>
+		<confirmation-user-form></confirmation-user-form> 
+		<show-all-users></show-all-users>
+ 	
+	</div>
+
+</div>
+
+
+<script type="text/javascript">
+
+angular.module('assignment2',[])
+	  .controller('LoginCtrl',function($scope,$window){
+	   	// to increment the id, when the new user is stored.
+	   	var id = 0;
+	   	// counter when the show button is clicked. if 0 then hide the button else show the button.
+	   	var showOrHide = 0;
+	   //	var phoneNumberReq = true;
+	   	// to show registration page.
+	   	$scope.logInFormPage = true;
+	   	// to show confirm page.
+	   	$scope.confirmPage = false;
+	   	// to display message when phone field is typed.
+	   	$scope.phoneValidatorMessage = "";
+	   //	$scope.phoneNumberRequiredOrNot = true;
+	   	// to display the show user button.
+	   	$scope.showUserButton = false;
+	   	// to display the "Show" or " Hide" users text in the button.
+	   	$scope.showOrHideTxt = "Show Users";
+	   	// to disable the input field after submitting the form.
+	   	$scope.disableInput = false;
+	   	// to display the table containing all users.
+	   	$scope.showUsers = false;
+	   	// to display the add user button. if "false" then disable else enable the button.
+	   	$scope.addUsers = false;
+	   	
+	   	// objects parameter to store.
+	   	$scope.user ={
+		  			'id':"",
+		  			'firstName':"",
+		  			'lastName':"",
+		  			'emailId':"",
+		  			'pwd':"",
+		  			'phone':""
+		  		    };
+		// to store users in the array.
+	   	$scope.allUsers = [];
+	   	// regex pattern for the telephone.
+	   	$scope.regex =/^\d{10}$/;
+	   	// link to confirm the page to submit the form.
+	   	$scope.confirm = function(){
+	   		$scope.logInFormPage = false;
+	   		$scope.confirmPage = true;
+	   		$scope.showUserButton = false;
+	   		$scope.showUsers = false;
+	   		
+	   	}
+	   	// link to go back to to the registration form page.
+	   	$scope.backPageLink = function(){
+	   		$scope.logInFormPage = true;
+	   		$scope.confirmPage = false;
+	   		
+	   	}
+	   	// function to submit the form.
+		  $scope.formSubmit = function(){
+		  	// storing the id of new user.
+		  	id = $scope.allUsers.length + 1;
+		  	if($scope.user.phone == ""){
+		  		$scope.user.phone = "--Not Available--";
+		  	}
+		  	// adding users into array.
+		  	$scope.allUsers.push(
+		  			{
+		  			'id':id,
+		  			'firstName':$scope.user.firstName,
+		  			'lastName':$scope.user.lastName,
+		  			'emailId':$scope.user.emailId,
+		  			'pwd':$scope.user.pwd,
+		  			'phone':$scope.user.phone
+		  		    }
+		  		);
+		  	// to enable the add users button after user has submitted the form.
+		  	$scope.addUsers = true;
+		  	$scope.user.firstName = "";
+		  	$scope.user.lastName = "";
+		  	$scope.user.emailId = "";
+		  	$scope.user.pwd = "";
+		  	$scope.user.phone = "";
+		  	// to enable the show users button.
+		  	if($scope.allUsers.length > 0){
+		  		$scope.showUserButton = true;
+		  		$scope.showUsers = true;
+		  		$scope.showOrHide = 1;
+		  	}
+		  	// if submit button is clicked, disabled the input field.
+		  	$scope.disableInput = true;
+		  	// to restore the original state of the form.
+		  	$scope.logInFormPage = true;
+		  	// to hide the confirm page after user has succesfully submitted the form.
+	   		$scope.confirmPage = false;
+	   		// Users are shown after submitting the form.
+
+
+	   		$scope.showOrHideTxt = "Hide Users";
+	   		// to restore the form to original state.
+		    $scope.loginForm.$setPristine();
+		  };
+		  // function to add more users.
+		  $scope.addMoreUsers = function(){
+		  	if($window.confirm("Do you want to add more users?")){
+		  		$scope.addUsers = false;
+		  		$scope.disableInput = false;
+		  	}else{
+		  		$scope.addUsers = true;
+		  		$scope.disableInput = true;
+		  	}
+		  	
+		  };
+		  // function to show all users.
+		  $scope.showAllUsers = function(){
+		  	
+		  	if(showOrHide == 0){
+		  		console.log("hide");
+		  		$scope.showUsers = false;
+		  		showOrHide = 1;
+		  		$scope.showOrHideTxt = "Show Users";
+		  	}else{
+		  		console.log("show");
+		  		$scope.showUsers = true;
+		  		showOrHide = 0;
+		  		$scope.showOrHideTxt = "Hide Users";
+		  	}
+		  };
+		  /**
+		  * function to return phone number field is optional when valid email id is entered.
+		  * Also the validator message to be displayed.
+		  */
+		  $scope.phoneNumberOptional = function(emailValid,emailIdModified,modifiedPhoneNumberField){
+		  	if(emailValid && emailIdModified){
+		  		$scope.phoneValidatorMessage = "Phone Number is optional as you have entered a valid email id.";
+		  		return true;
+		  	}
+		  };
+		  /**
+		  * function to return phone number field specifications.
+		  * Also the validator message to be displayed.
+		  */
+		  $scope.phoneNumberSpecification = function(emailValid,modifiedPhoneNumberField,invalidPhoneNumber){
+		  	if(modifiedPhoneNumberField && invalidPhoneNumber){
+		  		$scope.phoneValidatorMessage = "Phone Number must be at least 10 digits.";
+		  		return true;
+		  	}
+		  };
+
+		  /**
+		  * function to enable the submit button or not.
+		  */
+		  $scope.validFormOrNot = function(inValidLoginForm,inValidFirstName,inValidLastName,inValidEmail,inValidPwd,invalidPhoneNumber,unModifiedPhoneNumberField){
+		  	/**
+		  	* If valid email id is entered and phone number is not entered and all other fields are valid, 
+		  	* submit button is enabled.
+		  	*/
+		  	if(!inValidFirstName && !inValidLastName && !inValidEmail && !inValidPwd 
+		  		&& invalidPhoneNumber && unModifiedPhoneNumberField){
+		  		return false;
+		  	}
+		  	/**
+		  	* if valid email is entered and user also wants to enter phone number, then it checks for valid phone number then
+		    * enables the submit button else disable it.
+		  	*/
+		  	else if(!inValidFirstName && !inValidLastName && !inValidEmail && !inValidPwd 
+		  		&& invalidPhoneNumber && !unModifiedPhoneNumberField){
+		  		return true;
+		  	}
+		  	/**
+		  	* if form is valid, submit button is enabled.
+		  	*/
+		  	else if(!inValidLoginForm){
+		  		return false;
+		  	}else{
+		  		return true;
+		  	}
+		  }
+	   })
+	// Registration form page.
+	.directive('registrationPage',function(){
+		return{
+			restrict : 'E',
+			templateUrl : 'RegistrationPage.html'
+		}
+	})
+	// Asking users to confirm the data that has been entered.
+	.directive('confirmationUserForm',function(){
+		return {
+			restrict : 'E',
+			templateUrl : 'userConfirmation.html'
+		};
+	})
+	// Page to display all users.
+	.directive('showAllUsers',function(){
+		return{
+			restrict : 'E',
+			templateUrl : 'ShowUsers.html'
+
+		};
+
+	})
+</script>
+</body>
+</html>
